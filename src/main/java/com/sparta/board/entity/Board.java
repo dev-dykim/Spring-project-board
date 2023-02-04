@@ -1,5 +1,6 @@
 package com.sparta.board.entity;
 
+import com.sparta.board.dto.BoardRequestsDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,11 @@ public class Board extends Timestamped {
 
     @Column(nullable = false)
     private String password;
+
+    public Board(BoardRequestsDto requestsDto) {
+        this.title = requestsDto.getTitle();
+        this.contents = requestsDto.getContents();
+        this.author = requestsDto.getAuthor();
+        this.password = requestsDto.getPassword();
+    }
 }
