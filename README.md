@@ -18,3 +18,6 @@
 
 ### 2. 유스케이스 다이어그램
 ![usecase.png](document/usecase.png)
+
+### 3. API 명세서
+![api.png](document/api.png)
