@@ -1,5 +1,6 @@
 package com.sparta.board.dto;
 
+import com.sparta.board.entity.Board;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -20,5 +21,16 @@ public class BoardResponseDto {
         this.author = author;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
+    }
+
+    public static BoardResponseDto from(Board entity) {
+        return new BoardResponseDto(
+                entity.getId(),
+                entity.getTitle(),
+                entity.getContents(),
+                entity.getAuthor(),
+                entity.getCreatedAt(),
+                entity.getModifiedAt()
+        );
     }
 }
