@@ -1,7 +1,10 @@
 package com.sparta.board.dto;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class BoardResponseDto {
     private String title;
     private String contents;
