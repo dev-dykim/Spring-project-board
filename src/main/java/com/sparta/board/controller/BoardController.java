@@ -29,4 +29,9 @@ public class BoardController {
         return boardService.getPost(id);
     }
 
+    @PutMapping("/api/post/{id}")
+    public BoardResponseDto updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto) throws Exception {
+        return boardService.updatePost(id, requestsDto);
+    }
+
 }
