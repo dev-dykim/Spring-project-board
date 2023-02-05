@@ -33,4 +33,12 @@ public class BoardService {
         boardRepository.save(board);
         return new BoardResponseDto(board.getTitle(), board.getContents(), board.getAuthor(), board.getPassword(), board.getCreatedAt(), board.getModifiedAt());
     }
+
+    @Transactional
+    public BoardResponseDto getPost(Long id) {
+        Board board = boardRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+        return new BoardResponseDto(board.getTitle(), board.getContents(), board.getAuthor(), board.getPassword(), board.getCreatedAt(), board.getModifiedAt());
+    }
 }
