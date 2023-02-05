@@ -32,4 +32,11 @@ public class Board extends Timestamped {
         this.author = requestsDto.getAuthor();
         this.password = requestsDto.getPassword();
     }
+
+    public void update(BoardRequestsDto requestsDto) {
+        this.title = requestsDto.getTitle();
+        this.contents = requestsDto.getContents();
+        this.author = requestsDto.getAuthor();
+        this.password = requestsDto.getPassword();
+    }
 }
