@@ -22,7 +22,7 @@ public class BoardService {
         List<Board> posts = boardRepository.findAllByOrderByModifiedAtDesc();
         List<BoardResponseDto> responseDtos = new ArrayList<>();
         for (Board post : posts) {
-            responseDtos.add(new BoardResponseDto(post.getTitle(), post.getContents(), post.getAuthor(), post.getPassword(), post.getCreatedAt(), post.getModifiedAt()));
+            responseDtos.add(new BoardResponseDto(post.getId(), post.getTitle(), post.getContents(), post.getAuthor(), post.getCreatedAt(), post.getModifiedAt()));
         }
         return responseDtos;
     }
@@ -31,7 +31,7 @@ public class BoardService {
     public BoardResponseDto createPost(BoardRequestsDto requestsDto) {
         Board board = new Board(requestsDto);
         boardRepository.save(board);
-        return new BoardResponseDto(board.getTitle(), board.getContents(), board.getAuthor(), board.getPassword(), board.getCreatedAt(), board.getModifiedAt());
+        return new BoardResponseDto(board.getId(), board.getTitle(), board.getContents(), board.getAuthor(), board.getCreatedAt(), board.getModifiedAt());
     }
 
     @Transactional
@@ -39,6 +39,6 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        return new BoardResponseDto(board.getTitle(), board.getContents(), board.getAuthor(), board.getPassword(), board.getCreatedAt(), board.getModifiedAt());
+        return new BoardResponseDto(board.getId(), board.getTitle(), board.getContents(), board.getAuthor(), board.getCreatedAt(), board.getModifiedAt());
     }
 }
