@@ -2,10 +2,12 @@ package com.sparta.board.dto;
 
 import com.sparta.board.entity.Board;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor
 public class BoardResponseDto {
     private Long id;
     private String title;
@@ -14,23 +16,13 @@ public class BoardResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public BoardResponseDto(Long id, String title, String contents, String author, LocalDateTime createdAt, LocalDateTime modifiedAt) {
-        this.id = id;
-        this.title = title;
-        this.contents = contents;
-        this.author = author;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
+    public BoardResponseDto(Board entity) {
+        this.id = entity.getId();
+        this.title = entity.getTitle();
+        this.contents = entity.getContents();
+        this.author = entity.getAuthor();
+        this.createdAt = entity.getCreatedAt();
+        this.modifiedAt = entity.getModifiedAt();
     }
 
-    public static BoardResponseDto from(Board entity) {
-        return new BoardResponseDto(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getContents(),
-                entity.getAuthor(),
-                entity.getCreatedAt(),
-                entity.getModifiedAt()
-        );
-    }
 }
