@@ -5,6 +5,7 @@ import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.SuccessResponseDto;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,13 @@ public class BoardController {
     @GetMapping("/api/posts-order")
     public List<BoardResponseDto> getPostsOrderBy(@RequestParam(required = false, defaultValue = "modifiedAt", value = "orderby") String criteria) {
         return boardService.getPostsOrderBy(criteria);
+    }
+
+    @GetMapping("/api/posts-page")
+    public Page<BoardResponseDto> getPostsPage(@RequestParam(required = false, defaultValue = "0", value = "page") int pageNo,
+                                               @RequestParam(required = false, defaultValue = "modifiedAt", value = "orderby") String criteria,
+                                               @RequestParam(required = false, defaultValue = "DESC", value = "sort") String sort) {
+        return boardService.getPostsPage(pageNo, criteria, sort);
     }
 
 }

@@ -6,6 +6,10 @@ import com.sparta.board.dto.SuccessResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,4 +76,11 @@ public class BoardService {
             default -> boardRepository.findAllByOrderByModifiedAtDesc().stream().map(BoardResponseDto::new).toList();
         };
     }
+
+    public Page<BoardResponseDto> getPostsPage(int pageNo, String criteria, String sort) {
+        Pageable pageable = (sort.equals("ASC")) ? PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.ASC, criteria)) : PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, criteria));
+
+        return boardRepository.findAll(pageable).map(BoardResponseDto::new);
+    }
+
 }
