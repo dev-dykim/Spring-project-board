@@ -64,4 +64,12 @@ public class BoardService {
         if (!requestsDto.getPassword().equals(board.getPassword()))
             throw new Exception("비밀번호가 일치하지 않습니다.");
     }
+
+    public List<BoardResponseDto> getPostsOrderBy(String criteria) {
+        return switch (criteria) {
+            case "title" -> boardRepository.findAllByOrderByTitleDesc().stream().map(BoardResponseDto::new).toList();
+            case "author" -> boardRepository.findAllByOrderByAuthorDesc().stream().map(BoardResponseDto::new).toList();
+            default -> boardRepository.findAllByOrderByModifiedAtDesc().stream().map(BoardResponseDto::new).toList();
+        };
+    }
 }

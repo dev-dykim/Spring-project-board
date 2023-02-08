@@ -40,4 +40,9 @@ public class BoardController {
         return boardService.deletePost(id, requestsDto);
     }
 
+    @GetMapping("/api/posts-order")
+    public List<BoardResponseDto> getPostsOrderBy(@RequestParam(required = false, defaultValue = "modifiedAt", value = "orderby") String criteria) {
+        return boardService.getPostsOrderBy(criteria);
+    }
+
 }
