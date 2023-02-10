@@ -2,8 +2,10 @@ package com.sparta.board.controller;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
+import com.sparta.board.dto.SuccessResponseDto;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,9 +41,10 @@ public class BoardController {
         return boardService.updatePost(id, requestsDto, request);
     }
 
-//    @DeleteMapping("/api/post/{id}")
-//    public SuccessResponseDto deletePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto) throws Exception {
-//        return boardService.deletePost(id, requestsDto);
-//    }
+    // 선택된 게시글 삭제
+    @DeleteMapping("/api/post/{id}")
+    public ResponseEntity<SuccessResponseDto> deletePost(@PathVariable Long id, HttpServletRequest request) {
+        return boardService.deletePost(id, request);
+    }
 
 }

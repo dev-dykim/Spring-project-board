@@ -2,6 +2,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
+import com.sparta.board.dto.SuccessResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.User;
 import com.sparta.board.jwt.JwtUtil;
@@ -9,11 +10,14 @@ import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -105,15 +109,48 @@ public class BoardService {
         return null;
     }
 
-//    @Transactional
-//    public SuccessResponseDto deletePost(Long id, BoardRequestsDto requestsDto) throws Exception {
-//        Board board = getBoardOrElseThrow(id);
-//
-//        checkPassword(requestsDto, board);
-//
-//        boardRepository.deleteById(id);
-//        return new SuccessResponseDto(true);
-//    }
+    @Transactional
+    public ResponseEntity<SuccessResponseDto> deletePost(Long id, HttpServletRequest request) {
+
+        // Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 삭제 가능
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
+            Optional<Board> board = boardRepository.findByIdAndUser(id, user);
+            if (board.isEmpty()) { // 일치하는 게시물이 없다면
+                return ResponseEntity.badRequest() // status : 400
+                        .body(SuccessResponseDto.builder() // body : SuccessResponseDto (statusCode, msg)
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("본인이 작성한 게시글만 삭제가 가능합니다.")
+                                .build());
+            }
+
+            // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
+            boardRepository.deleteById(id);
+            return ResponseEntity.ok(SuccessResponseDto.builder()   // status : 200
+                    .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto
+                    .msg("게시글 삭제 성공")
+                    .build());
+        }
+
+        return null;
+    }
 
     private Board getBoardOrElseThrow(Long id) {
         return boardRepository.findById(id).orElseThrow(
