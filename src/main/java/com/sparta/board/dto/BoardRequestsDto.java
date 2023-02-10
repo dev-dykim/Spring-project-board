@@ -6,6 +6,4 @@ import lombok.Getter;
 public class BoardRequestsDto {
     private String title;
     private String contents;
-    private String author;
-    private String password;
 }
