@@ -33,9 +33,10 @@ public class BoardController {
         return boardService.getPost(id);
     }
 
+    // 선택된 게시글 수정
     @PutMapping("/api/post/{id}")
-    public BoardResponseDto updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto) throws Exception {
-        return boardService.updatePost(id, requestsDto);
+    public BoardResponseDto updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
+        return boardService.updatePost(id, requestsDto, request);
     }
 
 //    @DeleteMapping("/api/post/{id}")

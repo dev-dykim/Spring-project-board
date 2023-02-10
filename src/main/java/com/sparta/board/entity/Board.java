@@ -28,10 +28,9 @@ public class Board extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public void update(BoardRequestsDto requestsDto) {
+    public void update(BoardRequestsDto requestsDto, User user) {
         this.title = requestsDto.getTitle();
         this.contents = requestsDto.getContents();
-//        this.author = requestsDto.getAuthor();
-//        this.password = requestsDto.getPassword();
+        this.user = user;
     }
 }
