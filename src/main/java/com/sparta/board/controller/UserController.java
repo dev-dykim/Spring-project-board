@@ -1,7 +1,7 @@
 package com.sparta.board.controller;
 
-import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.dto.SuccessResponseDto;
+import com.sparta.board.dto.UserRequestDto;
 import com.sparta.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SuccessResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<SuccessResponseDto> signup(@Valid @RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
         return userService.signup(requestDto, bindingResult);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<SuccessResponseDto> login(@RequestBody UserRequestDto requestDto) {
+        return userService.login(requestDto);
     }
 }
