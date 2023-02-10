@@ -29,19 +29,21 @@ public class UserService {
 
         // 입력한 username, password 유효성 검사 통과 못한 경우
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(SuccessResponseDto.builder()
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .msg(bindingResult.getAllErrors().get(0).getDefaultMessage())
-                    .build());
+            return ResponseEntity.badRequest()  // status : bad request
+                    .body(SuccessResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .msg(bindingResult.getAllErrors().get(0).getDefaultMessage())
+                            .build());
         }
 
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            return ResponseEntity.badRequest().body(SuccessResponseDto.builder()
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .msg("중복된 사용자가 존재합니다.")
-                    .build());
+            return ResponseEntity.badRequest()  // status : bad request
+                    .body(SuccessResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .msg("중복된 사용자가 존재합니다.")
+                            .build());
         }
 
         // 입력한 username, password 로 user 객체 만들어 repository 에 저장
@@ -50,8 +52,8 @@ public class UserService {
                 .password(password)
                 .build());
 
-        return ResponseEntity.ok(SuccessResponseDto.builder()
-                .statusCode(HttpStatus.OK.value())
+        return ResponseEntity.ok(SuccessResponseDto.builder()   // status : ok
+                .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto (statusCode, msg)
                 .msg("회원가입 성공")
                 .build());
 
