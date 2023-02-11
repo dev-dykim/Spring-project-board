@@ -1,6 +1,6 @@
 package com.sparta.board.service;
 
-import com.sparta.board.dto.SuccessResponseDto;
+import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.dto.UserRequestDto;
 import com.sparta.board.entity.User;
 import com.sparta.board.jwt.JwtUtil;
@@ -23,14 +23,14 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public ResponseEntity<SuccessResponseDto> signup(UserRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<MessageResponseDto> signup(UserRequestDto requestDto, BindingResult bindingResult) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
         // 입력한 username, password 유효성 검사 통과 못한 경우
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()  // status : bad request
-                    .body(SuccessResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
+                    .body(MessageResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
                             .statusCode(HttpStatus.BAD_REQUEST.value())
                             .msg(bindingResult.getAllErrors().get(0).getDefaultMessage())
                             .build());
@@ -40,7 +40,7 @@ public class UserService {
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
             return ResponseEntity.badRequest()  // status : bad request
-                    .body(SuccessResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
+                    .body(MessageResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
                             .statusCode(HttpStatus.BAD_REQUEST.value())
                             .msg("중복된 사용자가 존재합니다.")
                             .build());
@@ -52,7 +52,7 @@ public class UserService {
                 .password(password)
                 .build());
 
-        return ResponseEntity.ok(SuccessResponseDto.builder()   // status : ok
+        return ResponseEntity.ok(MessageResponseDto.builder()   // status : ok
                 .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto (statusCode, msg)
                 .msg("회원가입 성공")
                 .build());
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<SuccessResponseDto> login(UserRequestDto requestDto) {
+    public ResponseEntity<MessageResponseDto> login(UserRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
@@ -68,7 +68,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             return ResponseEntity.badRequest()  // status : badRequest
-                    .body(SuccessResponseDto.builder() // body : SuccessResponseDto -> statusCode, msg
+                    .body(MessageResponseDto.builder() // body : SuccessResponseDto -> statusCode, msg
                             .statusCode(HttpStatus.BAD_REQUEST.value())
                             .msg("등록된 사용자가 없습니다.")
                             .build());
@@ -77,7 +77,7 @@ public class UserService {
         // 비밀번호 확인
         if(!user.get().getPassword().equals(password)){
             return ResponseEntity.badRequest()
-                    .body(SuccessResponseDto.builder()
+                    .body(MessageResponseDto.builder()
                             .statusCode(HttpStatus.BAD_REQUEST.value())
                             .msg("비밀번호가 일치하지 않습니다.")
                             .build());
@@ -89,7 +89,7 @@ public class UserService {
 
         return ResponseEntity.ok()  // status -> OK
                 .headers(headers)   // headers -> JWT
-                .body(SuccessResponseDto.builder() // body -> SuccessResponseDto -> statusCode, msg
+                .body(MessageResponseDto.builder() // body -> SuccessResponseDto -> statusCode, msg
                         .statusCode(HttpStatus.OK.value())
                         .msg("로그인 성공")
                         .build());
