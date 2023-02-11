@@ -1,18 +1,16 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.BoardRequestsDto;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Builder
+
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 public class Board extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,6 +25,13 @@ public class Board extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Builder
+    public Board(BoardRequestsDto requestsDto, User user) {
+        this.title = requestsDto.getTitle();
+        this.contents = requestsDto.getContents();
+        this.user = user;
+    }
 
     public void update(BoardRequestsDto requestsDto, User user) {
         this.title = requestsDto.getTitle();

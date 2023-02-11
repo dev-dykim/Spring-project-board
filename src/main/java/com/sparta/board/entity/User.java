@@ -1,6 +1,6 @@
 package com.sparta.board.entity;
 
-import lombok.AllArgsConstructor;
+import com.sparta.board.dto.UserRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "users")
 public class User {
 
@@ -24,4 +22,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Builder
+    public User(UserRequestDto requestsDto) {
+        this.username = requestsDto.getUsername();
+        this.password = requestsDto.getPassword();
+    }
 }
