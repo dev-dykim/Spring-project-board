@@ -2,7 +2,6 @@ package com.sparta.board.controller;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
-import com.sparta.board.dto.SuccessResponseDto;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +42,7 @@ public class BoardController {
 
     // 선택된 게시글 삭제
     @DeleteMapping("/api/post/{id}")
-    public ResponseEntity<SuccessResponseDto> deletePost(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> deletePost(@PathVariable Long id, HttpServletRequest request) {
         return boardService.deletePost(id, request);
     }
 
