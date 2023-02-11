@@ -2,7 +2,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
-import com.sparta.board.dto.SuccessResponseDto;
+import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.User;
 import com.sparta.board.jwt.JwtUtil;
@@ -160,7 +160,7 @@ public class BoardService {
 
             // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
             boardRepository.deleteById(id);
-            return ResponseEntity.ok(SuccessResponseDto.builder()   // status : 200
+            return ResponseEntity.ok(MessageResponseDto.builder()   // status : 200
                     .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto
                     .msg("게시글 삭제 성공")
                     .build());
@@ -173,7 +173,7 @@ public class BoardService {
     private static ResponseEntity<Object> responseException(String message) {
         return ResponseEntity   // ResponseEntity 를 반환
                 .badRequest()   // status : bad request
-                .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                .body(MessageResponseDto.builder()  // body : SuccessResponseDto
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .msg(message)
                         .build());
