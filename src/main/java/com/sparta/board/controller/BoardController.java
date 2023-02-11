@@ -19,25 +19,25 @@ public class BoardController {
 
     // 게시글 전체 목록 조회
     @GetMapping("/api/posts")
-    public List<BoardResponseDto> getPosts() {
+    public ResponseEntity<List<BoardResponseDto>> getPosts() {
         return boardService.getPosts();
     }
 
     // 게시글 작성
     @PostMapping("/api/post")
-    public BoardResponseDto createPost(@RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<Object> createPost(@RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
         return boardService.createPost(requestsDto, request);
     }
 
     // 선택된 게시글 조회
     @GetMapping("/api/post/{id}")
-    public BoardResponseDto getPost(@PathVariable Long id) {
+    public ResponseEntity<Object> getPost(@PathVariable Long id) {
         return boardService.getPost(id);
     }
 
     // 선택된 게시글 수정
     @PutMapping("/api/post/{id}")
-    public BoardResponseDto updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<Object> updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
         return boardService.updatePost(id, requestsDto, request);
     }
 

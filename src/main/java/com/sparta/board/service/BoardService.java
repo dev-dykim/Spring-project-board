@@ -29,13 +29,18 @@ public class BoardService {
 
     // 게시글 전체 목록 조회
     @Transactional(readOnly = true)
-    public List<BoardResponseDto> getPosts() {
-        return boardRepository.findAllByOrderByModifiedAtDesc().stream().map(BoardResponseDto::new).toList();
+    public ResponseEntity<List<BoardResponseDto>> getPosts() {
+        return ResponseEntity   // ResponseEntity 반환
+                .ok(boardRepository  // status : OK
+                        .findAllByOrderByModifiedAtDesc()   // body : List<BoardResponseDto>
+                        .stream()
+                        .map(BoardResponseDto::new)
+                        .toList());
     }
 
     // 게시글 작성
     @Transactional
-    public BoardResponseDto createPost(BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<Object> createPost(BoardRequestsDto requestsDto, HttpServletRequest request) {
 
         // Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
@@ -48,34 +53,64 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return ResponseEntity   // ResponseEntity 를 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("Token Error")
+                                .build());
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            Optional<User> user = userRepository.findByUsername(claims.getSubject());
+            if (user.isEmpty()) {   // 토큰에서 가져온 사용자가 DB에 없는 경우
+                return ResponseEntity   // ResponseEntity 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("사용자가 존재하지 않습니다.")
+                                .build());
+            }
 
-            // 게시글 저장 후 responseDto 로 담아서 반환
-            return new BoardResponseDto(boardRepository.save(Board.builder()
-                            .title(requestsDto.getTitle())
-                            .contents(requestsDto.getContents())
-                            .user(user)
-                            .build()));
+            return ResponseEntity   // ResponseEntity 반환
+                    .ok(new BoardResponseDto(boardRepository    // status : OK, Body : BoardResponseDto
+                            .save(Board.builder()   // requestDto 에서 받은 게시글 내용으로 Board 객체를 만들어 저장한 것을 responseDto로 변환
+                                    .title(requestsDto.getTitle())
+                                    .contents(requestsDto.getContents())
+                                    .user(user.get())
+                                    .build())));
         }
 
-        return null;
+        // 토큰이 없는 경우
+        return ResponseEntity
+                .badRequest()
+                .body(SuccessResponseDto.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .msg("토큰이 없습니다.")
+                        .build());
     }
 
     // 선택된 게시글 조회
     @Transactional(readOnly = true)
-    public BoardResponseDto getPost(Long id) {
-        return new BoardResponseDto(getBoardOrElseThrow(id));
+    public ResponseEntity<Object> getPost(Long id) {
+        // Id에 해당하는 게시글이 있는지 확인
+        Optional<Board> board = boardRepository.findById(id);
+        if (board.isEmpty()) { // 해당 게시글이 없다면
+            return ResponseEntity   // ResponseEntity 반환
+                    .badRequest()   // status : bad request
+                    .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .msg("해당 게시글이 존재하지 않습니다.")
+                            .build());
+        }
+
+        // 해당 게시글이 있다면 게시글 객체를 Dto 로 변환 후, ResponseEntity body 에 담아 리턴
+        return ResponseEntity.ok(new BoardResponseDto(board.get()));
     }
 
     // 선택된 게시글 수정
     @Transactional
-    public BoardResponseDto updatePost(Long id, BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<Object> updatePost(Long id, BoardRequestsDto requestsDto, HttpServletRequest request) {
 
         // Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
@@ -88,27 +123,51 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return ResponseEntity   // ResponseEntity 를 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("Token Error")
+                                .build());
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            Optional<User> user = userRepository.findByUsername(claims.getSubject());
+            if (user.isEmpty()) {   // 토큰에서 가져온 사용자가 DB에 없는 경우
+                return ResponseEntity   // ResponseEntity 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("사용자가 존재하지 않습니다.")
+                                .build());
+            }
 
             // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
-            Board board = boardRepository.findByIdAndUser(id, user).orElseThrow(
-                    () -> new IllegalArgumentException("본인이 작성한 게시글만 수정이 가능합니다.")
-            );
+            Optional<Board> board = boardRepository.findByIdAndUser(id, user.get());
+            if (board.isEmpty()) { // 일치하는 게시물이 없다면
+                return ResponseEntity.badRequest() // status : 400
+                        .body(SuccessResponseDto.builder() // body : SuccessResponseDto (statusCode, msg)
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("본인이 작성한 게시글만 수정이 가능합니다.")
+                                .build());
+            }
 
             // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
-            board.update(requestsDto, user);
-            return new BoardResponseDto(board);
+            board.get().update(requestsDto, user.get());
+
+            return ResponseEntity.ok(new BoardResponseDto(board.get()));
         }
 
-        return null;
+        // 토큰이 없는 경우
+        return ResponseEntity
+                .badRequest()
+                .body(SuccessResponseDto.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .msg("토큰이 없습니다.")
+                        .build());
     }
 
+    // 게시글 삭제
     @Transactional
     public ResponseEntity<SuccessResponseDto> deletePost(Long id, HttpServletRequest request) {
 
@@ -123,16 +182,27 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return ResponseEntity   // ResponseEntity 를 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("Token Error")
+                                .build());
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            Optional<User> user = userRepository.findByUsername(claims.getSubject());
+            if (user.isEmpty()) {   // 토큰에서 가져온 사용자가 DB에 없는 경우
+                return ResponseEntity   // ResponseEntity 반환
+                        .badRequest()   // status : bad request
+                        .body(SuccessResponseDto.builder()  // body : SuccessResponseDto
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .msg("사용자가 존재하지 않습니다.")
+                                .build());
+            }
 
             // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
-            Optional<Board> board = boardRepository.findByIdAndUser(id, user);
+            Optional<Board> board = boardRepository.findByIdAndUser(id, user.get());
             if (board.isEmpty()) { // 일치하는 게시물이 없다면
                 return ResponseEntity.badRequest() // status : 400
                         .body(SuccessResponseDto.builder() // body : SuccessResponseDto (statusCode, msg)
@@ -149,13 +219,13 @@ public class BoardService {
                     .build());
         }
 
-        return null;
-    }
-
-    private Board getBoardOrElseThrow(Long id) {
-        return boardRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
+        // 토큰이 없는 경우
+        return ResponseEntity
+                .badRequest()
+                .body(SuccessResponseDto.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .msg("토큰이 없습니다.")
+                        .build());
     }
 
 }
