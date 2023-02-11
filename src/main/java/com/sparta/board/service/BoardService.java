@@ -65,8 +65,7 @@ public class BoardService {
             return ResponseEntity   // ResponseEntity 반환
                     .ok(new BoardResponseDto(boardRepository    // status : OK, Body : BoardResponseDto
                             .save(Board.builder()   // requestDto 에서 받은 게시글 내용으로 Board 객체를 만들어 저장한 것을 responseDto로 변환
-                                    .title(requestsDto.getTitle())
-                                    .contents(requestsDto.getContents())
+                                    .requestsDto(requestsDto)
                                     .user(user.get())
                                     .build())));
         }
