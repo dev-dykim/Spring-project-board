@@ -1,12 +1,10 @@
 package com.sparta.board.dto;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Pattern;
 
 @Getter
-@RequiredArgsConstructor
 public class SignupRequestDto {
 
     // 아이디 유효성 검사
