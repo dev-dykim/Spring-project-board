@@ -1,7 +1,8 @@
 package com.sparta.board.service;
 
+import com.sparta.board.dto.LoginRequestDto;
 import com.sparta.board.dto.MessageResponseDto;
-import com.sparta.board.dto.UserRequestDto;
+import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.User;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
@@ -22,8 +23,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    // 회원가입
     @Transactional
-    public ResponseEntity<MessageResponseDto> signup(UserRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<MessageResponseDto> signup(SignupRequestDto requestDto, BindingResult bindingResult) {
 
         // 입력한 username, password 유효성 검사 통과 못한 경우
         if (bindingResult.hasErrors()) {
@@ -55,8 +57,9 @@ public class UserService {
 
     }
 
+    // 로그인
     @Transactional(readOnly = true)
-    public ResponseEntity<MessageResponseDto> login(UserRequestDto requestDto) {
+    public ResponseEntity<MessageResponseDto> login(LoginRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
