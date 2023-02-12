@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -25,6 +27,9 @@ public class Board extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<Comment> commentList = new ArrayList<>();
 
     @Builder
     public Board(BoardRequestsDto requestsDto, User user) {
