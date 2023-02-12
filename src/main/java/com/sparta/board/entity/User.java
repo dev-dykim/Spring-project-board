@@ -1,6 +1,6 @@
 package com.sparta.board.entity;
 
-import com.sparta.board.dto.UserRequestDto;
+import com.sparta.board.dto.SignupRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +22,21 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum role;
+
     @Builder
-    public User(UserRequestDto requestsDto) {
+    public User(SignupRequestDto requestsDto) {
         this.username = requestsDto.getUsername();
         this.password = requestsDto.getPassword();
+
+        // admin = true 로 입력했을 경우
+        if (requestsDto.getAdmin()) {
+            this.role = UserRoleEnum.ADMIN;
+        } else {  // admin = false 로 입력했을 경우
+            this.role = UserRoleEnum.USER;
+        }
     }
+
 }
