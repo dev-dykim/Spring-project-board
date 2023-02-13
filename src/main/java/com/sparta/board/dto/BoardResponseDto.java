@@ -1,11 +1,14 @@
 package com.sparta.board.dto;
 
 import com.sparta.board.entity.Board;
+import com.sparta.board.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -16,6 +19,7 @@ public class BoardResponseDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private List<CommentResponseDto> commentList;
 
     @Builder
     public BoardResponseDto(Board entity) {
@@ -25,6 +29,10 @@ public class BoardResponseDto {
         this.username = entity.getUser().getUsername();
         this.createdAt = entity.getCreatedAt();
         this.modifiedAt = entity.getModifiedAt();
+        this.commentList = entity.getCommentList().stream()
+                .sorted(Comparator.comparing(Comment::getModifiedAt).reversed())
+                .map(CommentResponseDto::new)
+                .toList();
     }
 
 }
