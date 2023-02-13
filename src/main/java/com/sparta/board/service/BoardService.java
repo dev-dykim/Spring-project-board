@@ -157,6 +157,12 @@ public class BoardService {
                 return responseException("사용자가 존재하지 않습니다.");
             }
 
+            // 선택한 게시글이 DB에 있는지 확인
+            Optional<Board> found = boardRepository.findById(id);
+            if (found.isEmpty()) {
+                return responseException("게시글이 존재하지 않습니다.");
+            }
+
             // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
             Optional<Board> board = boardRepository.findByIdAndUser(id, user.get());
             if (board.isEmpty()) { // 일치하는 게시물이 없다면
