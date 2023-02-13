@@ -25,26 +25,18 @@ public class UserService {
 
     // 회원가입
     @Transactional
-    public ResponseEntity<MessageResponseDto> signup(SignupRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<Object> signup(SignupRequestDto requestDto, BindingResult bindingResult) {
 
         // 입력한 username, password 유효성 검사 통과 못한 경우
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest()  // status : bad request
-                    .body(MessageResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .msg(bindingResult.getAllErrors().get(0).getDefaultMessage())
-                            .build());
+            return responseException(bindingResult.getAllErrors().get(0).getDefaultMessage()); // @valid 에서 exception 발생 시, 해당 메시지를 출력한다.
         }
 
         // 회원 중복 확인
         String username = requestDto.getUsername();
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            return ResponseEntity.badRequest()  // status : bad request
-                    .body(MessageResponseDto.builder()  // body : SuccessResponseDto (statusCode, msg)
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .msg("중복된 사용자가 존재합니다.")
-                            .build());
+            return responseException("중복된 username 입니다.");
         }
 
         // 입력한 username, password 로 user 객체 만들어 repository 에 저장
@@ -59,27 +51,14 @@ public class UserService {
 
     // 로그인
     @Transactional(readOnly = true)
-    public ResponseEntity<MessageResponseDto> login(LoginRequestDto requestDto) {
+    public ResponseEntity<Object> login(LoginRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
-        // 사용자 확인
+        // 사용자 확인 & 비밀번호 체크
         Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest()  // status : badRequest
-                    .body(MessageResponseDto.builder() // body : SuccessResponseDto -> statusCode, msg
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .msg("등록된 사용자가 없습니다.")
-                            .build());
-        }
-
-        // 비밀번호 확인
-        if(!user.get().getPassword().equals(password)){
-            return ResponseEntity.badRequest()
-                    .body(MessageResponseDto.builder()
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .msg("비밀번호가 일치하지 않습니다.")
-                            .build());
+        if (user.isEmpty() || !(user.get().getPassword().equals(password))) {
+            return responseException("회원을 찾을 수 없습니다.");
         }
 
         // header 에 들어갈 JWT 세팅
@@ -93,5 +72,15 @@ public class UserService {
                         .msg("로그인 성공")
                         .build());
 
+    }
+
+    // 예외 경우 처리
+    private static ResponseEntity<Object> responseException(String message) {
+        return ResponseEntity   // ResponseEntity 를 반환
+                .badRequest()   // status : bad request
+                .body(MessageResponseDto.builder()  // body : SuccessResponseDto
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .msg(message)
+                        .build());
     }
 }

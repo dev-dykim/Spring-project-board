@@ -53,7 +53,7 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return responseException("Token Error");
+                return responseException("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -71,7 +71,7 @@ public class BoardService {
         }
 
         // 토큰이 없는 경우
-        return responseException("토큰이 없습니다.");
+        return responseException("토큰이 유효하지 않습니다.");
     }
 
     // 선택된 게시글 조회
@@ -80,7 +80,7 @@ public class BoardService {
         // Id에 해당하는 게시글이 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
         if (board.isEmpty()) { // 해당 게시글이 없다면
-            return responseException("해당 게시글이 존재하지 않습니다.");
+            return responseException("게시글이 존재하지 않습니다.");
         }
 
         // 해당 게시글이 있다면 게시글 객체를 Dto 로 변환 후, ResponseEntity body 에 담아 리턴
@@ -102,7 +102,7 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return responseException("Token Error");
+                return responseException("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -111,10 +111,16 @@ public class BoardService {
                 return responseException("사용자가 존재하지 않습니다.");
             }
 
+            // 선택한 게시글이 DB에 있는지 확인
+            Optional<Board> found = boardRepository.findById(id);
+            if (found.isEmpty()) {
+                return responseException("게시글이 존재하지 않습니다.");
+            }
+
             // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
             Optional<Board> board = boardRepository.findByIdAndUser(id, user.get());
             if (board.isEmpty()) { // 일치하는 게시물이 없다면
-                return responseException("본인이 작성한 게시글만 수정이 가능합니다.");
+                return responseException("작성자만 수정할 수 있습니다.");
             }
 
             // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
@@ -124,7 +130,7 @@ public class BoardService {
         }
 
         // 토큰이 없는 경우
-        return responseException("토큰이 없습니다.");
+        return responseException("토큰이 유효하지 않습니다.");
     }
 
     // 게시글 삭제
@@ -142,7 +148,7 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return responseException("Token Error");
+                return responseException("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -154,7 +160,7 @@ public class BoardService {
             // 선택한 게시글의 id와 토큰에서 가져온 사용자 정보가 일치하는 게시물이 있는지 확인
             Optional<Board> board = boardRepository.findByIdAndUser(id, user.get());
             if (board.isEmpty()) { // 일치하는 게시물이 없다면
-                return responseException("본인이 작성한 게시글만 삭제가 가능합니다.");
+                return responseException("작성자만 삭제할 수 있습니다.");
             }
 
             // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
@@ -166,9 +172,10 @@ public class BoardService {
         }
 
         // 토큰이 없는 경우
-        return responseException("토큰이 없습니다.");
+        return responseException("토큰이 유효하지 않습니다.");
     }
 
+    // 예외 경우 처리
     private static ResponseEntity<Object> responseException(String message) {
         return ResponseEntity   // ResponseEntity 를 반환
                 .badRequest()   // status : bad request
