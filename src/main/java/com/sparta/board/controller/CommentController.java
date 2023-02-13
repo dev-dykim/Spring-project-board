@@ -27,4 +27,10 @@ public class CommentController {
         return commentService.updateComment(id, requestDto, request);
     }
 
+    // 댓글 삭제
+    @DeleteMapping("/comment/{id}")     // 여기서 ID는 댓글의 id
+    public ResponseEntity<Object> deleteComment(@PathVariable Long id, HttpServletRequest request) {
+        return commentService.deleteComment(id, request);
+    }
+
 }

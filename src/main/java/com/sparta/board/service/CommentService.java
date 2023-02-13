@@ -124,8 +124,59 @@ public class CommentService {
         return responseException("토큰이 유효하지 않습니다.");
     }
 
+    // 댓글 삭제
+    @Transactional
+    public ResponseEntity<Object> deleteComment(Long id, HttpServletRequest request) {
+        // Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 수정 가능
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                return responseException("토큰이 유효하지 않습니다.");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회(댓글 삭제하려는 사용자 조회)
+            Optional<User> user = userRepository.findByUsername(claims.getSubject());
+            if (user.isEmpty()) {   // 토큰에서 가져온 사용자가 DB에 없는 경우
+                return responseException("사용자가 존재하지 않습니다.");
+            }
+
+            // 선택한 댓글이 DB에 있는지 확인
+            Optional<Comment> comment = commentRepository.findById(id);
+            if (comment.isEmpty()) {
+                return responseException("댓글이 존재하지 않습니다.");
+            }
+
+            // 댓글의 작성자와 삭제하려는 사용자의 정보가 일치하는지 확인 (삭제하려는 사용자가 관리자라면 댓글 삭제 가능)
+            Optional<Comment> found = commentRepository.findByIdAndUser(id, user.get());
+            if (found.isEmpty() && user.get().getRole() == UserRoleEnum.USER) {
+                return responseException("작성자만 삭제/수정할 수 있습니다.");
+            }
+
+            // 관리자이거나, 댓글의 작성자와 삭제하려는 사용자의 정보가 일치한다면, 댓글 삭제
+            commentRepository.deleteById(id);
+
+            // ResponseEntity에 상태코드, 메시지 들어있는 DTO를 담아서 반환
+            return ResponseEntity
+                    .ok(MessageResponseDto
+                            .builder()
+                            .msg("댓글 삭제 성공")
+                            .statusCode(HttpStatus.OK.value())
+                            .build());
+        }
+
+        // 토큰이 없는 경우
+        return responseException("토큰이 유효하지 않습니다.");
+    }
+
     // 예외 경우 처리
-    private static ResponseEntity<Object> responseException(String message) {
+    private static ResponseEntity<Object> responseException (String message){
         return ResponseEntity   // ResponseEntity 를 반환
                 .badRequest()   // status : bad request
                 .body(MessageResponseDto.builder()  // body : SuccessResponseDto
