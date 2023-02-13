@@ -101,15 +101,15 @@ public class CommentService {
             }
 
             // 선택한 댓글이 DB에 있는지 확인
-            Optional<Comment> comment = commentRepository.findById(id);
-            if (comment.isEmpty()) {
+            Optional<Comment> found = commentRepository.findById(id);
+            if (found.isEmpty()) {
                 return responseException("댓글이 존재하지 않습니다.");
             }
 
             // 댓글의 작성자와 수정하려는 사용자의 정보가 일치하는지 확인 (수정하려는 사용자가 관리자라면 댓글 수정 가능)
-            Optional<Comment> found = commentRepository.findByIdAndUser(id, user.get());
-            if (found.isEmpty() && user.get().getRole() == UserRoleEnum.USER) {
-                return responseException("작성자만 삭제/수정할 수 있습니다.");
+            Optional<Comment> comment = commentRepository.findByIdAndUser(id, user.get());
+            if (comment.isEmpty() && user.get().getRole() == UserRoleEnum.USER) {
+                return responseException("작성자만 수정할 수 있습니다.");
             }
 
             // 관리자이거나, 댓글의 작성자와 수정하려는 사용자의 정보가 일치한다면, 댓글 수정
@@ -156,7 +156,7 @@ public class CommentService {
             // 댓글의 작성자와 삭제하려는 사용자의 정보가 일치하는지 확인 (삭제하려는 사용자가 관리자라면 댓글 삭제 가능)
             Optional<Comment> found = commentRepository.findByIdAndUser(id, user.get());
             if (found.isEmpty() && user.get().getRole() == UserRoleEnum.USER) {
-                return responseException("작성자만 삭제/수정할 수 있습니다.");
+                return responseException("작성자만 삭제할 수 있습니다.");
             }
 
             // 관리자이거나, 댓글의 작성자와 삭제하려는 사용자의 정보가 일치한다면, 댓글 삭제
