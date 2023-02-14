@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.SignupRequestDto;
+import com.sparta.board.entity.enumSet.UserRoleEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

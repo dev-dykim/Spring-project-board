@@ -1,6 +1,6 @@
 package com.sparta.board.jwt;
 
-import com.sparta.board.entity.UserRoleEnum;
+import com.sparta.board.entity.enumSet.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
