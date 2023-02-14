@@ -106,6 +106,7 @@ public class CommentService {
 
         // 관리자이거나, 댓글의 작성자와 수정하려는 사용자의 정보가 일치한다면, 댓글 수정
         comment.get().update(requestDto, user.get());
+        commentRepository.saveAndFlush(comment.get());   // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
 
         // ResponseEntity 에 dto 담아서 리턴
         return ResponseEntity.ok(CommentResponseDto.builder().entity(comment.get()).build());

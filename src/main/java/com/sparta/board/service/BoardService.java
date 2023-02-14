@@ -131,6 +131,7 @@ public class BoardService {
 
         // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
         board.get().update(requestsDto, user.get());
+        boardRepository.saveAndFlush(board.get());  // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
 
         return ResponseEntity.ok(new BoardResponseDto(board.get()));
 
