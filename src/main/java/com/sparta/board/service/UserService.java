@@ -4,6 +4,7 @@ import com.sparta.board.dto.LoginRequestDto;
 import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.User;
+import com.sparta.board.entity.enumSet.ErrorType;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.Optional;
+
+import static com.sparta.board.exception.ExceptionHandling.responseException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +32,14 @@ public class UserService {
 
         // 입력한 username, password 유효성 검사 통과 못한 경우
         if (bindingResult.hasErrors()) {
-            return responseException(bindingResult.getAllErrors().get(0).getDefaultMessage()); // @valid 에서 exception 발생 시, 해당 메시지를 출력한다.
+            return responseException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage()); // @valid 에서 exception 발생 시, 해당 메시지를 출력한다.
         }
 
         // 회원 중복 확인
         String username = requestDto.getUsername();
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            return responseException("중복된 username 입니다.");
+            return responseException(ErrorType.DUPLICATED_USERNAME);
         }
 
         // 입력한 username, password 로 user 객체 만들어 repository 에 저장
@@ -58,12 +61,12 @@ public class UserService {
         // 사용자 확인 & 비밀번호 체크
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty() || !(user.get().getPassword().equals(password))) {
-            return responseException("회원을 찾을 수 없습니다.");
+            return responseException(ErrorType.NOT_MATCHING_INFO);
         }
 
         // header 에 들어갈 JWT 세팅
         HttpHeaders headers = new HttpHeaders();
-        headers.set(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.get().getUsername()));
+        headers.set(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.get().getUsername(), user.get().getRole()));
 
         return ResponseEntity.ok()  // status -> OK
                 .headers(headers)   // headers -> JWT
@@ -74,13 +77,4 @@ public class UserService {
 
     }
 
-    // 예외 경우 처리
-    private static ResponseEntity<Object> responseException(String message) {
-        return ResponseEntity   // ResponseEntity 를 반환
-                .badRequest()   // status : bad request
-                .body(MessageResponseDto.builder()  // body : SuccessResponseDto
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .msg(message)
-                        .build());
-    }
 }
