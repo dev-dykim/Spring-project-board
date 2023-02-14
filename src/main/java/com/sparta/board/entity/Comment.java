@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.CommentRequestDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +10,14 @@ import javax.persistence.*;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2000)
     private String contents;
 
     @ManyToOne
