@@ -4,6 +4,7 @@ import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.Board;
+import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.User;
 import com.sparta.board.entity.enumSet.ErrorType;
 import com.sparta.board.entity.enumSet.UserRoleEnum;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +36,18 @@ public class BoardService {
     // 게시글 전체 목록 조회
     @Transactional(readOnly = true)
     public ResponseEntity<List<BoardResponseDto>> getPosts() {
-        return ResponseEntity   // ResponseEntity 반환
-                .ok(boardRepository  // status : OK
-                        .findAllByOrderByModifiedAtDesc()   // body : List<BoardResponseDto>
-                        .stream()
-                        .map(BoardResponseDto::new)
-                        .toList());
+
+        List<Board> boardList = boardRepository.findAllByOrderByModifiedAtDesc();
+
+        // 댓글리스트 작성일자 기준 내림차순 정렬
+        for (Board board : boardList) {
+            board.getCommentList().sort(Comparator.comparing(Comment::getModifiedAt).reversed());
+        }
+
+        List<BoardResponseDto> responseDto = boardList.stream().map(BoardResponseDto::new).toList();
+
+        return ResponseEntity.ok(responseDto);
+
     }
 
     // 게시글 작성
