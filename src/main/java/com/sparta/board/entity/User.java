@@ -1,6 +1,8 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.SignupRequestDto;
+import com.sparta.board.entity.enumSet.UserRoleEnum;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,21 +10,21 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
 @Entity(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 

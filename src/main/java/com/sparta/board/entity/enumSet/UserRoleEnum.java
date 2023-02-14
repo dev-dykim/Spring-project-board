@@ -1,4 +1,4 @@
-package com.sparta.board.entity;
+package com.sparta.board.entity.enumSet;
 
 public enum UserRoleEnum {
     USER,   // 사용자 권한

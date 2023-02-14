@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.BoardRequestsDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,7 +22,7 @@ public class Board extends Timestamped {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 65535)
     private String contents;
 
     @ManyToOne
