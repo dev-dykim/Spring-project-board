@@ -2,6 +2,7 @@ package com.sparta.board.controller;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
+import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,25 +25,25 @@ public class BoardController {
 
     // 게시글 작성
     @PostMapping("/api/post")
-    public ResponseEntity<Object> createPost(@RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<BoardResponseDto> createPost(@RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
         return boardService.createPost(requestsDto, request);
     }
 
     // 선택된 게시글 조회
     @GetMapping("/api/post/{id}")
-    public ResponseEntity<Object> getPost(@PathVariable Long id) {
+    public ResponseEntity<BoardResponseDto> getPost(@PathVariable Long id) {
         return boardService.getPost(id);
     }
 
     // 선택된 게시글 수정
     @PutMapping("/api/post/{id}")
-    public ResponseEntity<Object> updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
+    public ResponseEntity<BoardResponseDto> updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
         return boardService.updatePost(id, requestsDto, request);
     }
 
     // 선택된 게시글 삭제
     @DeleteMapping("/api/post/{id}")
-    public ResponseEntity<Object> deletePost(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<MessageResponseDto> deletePost(@PathVariable Long id, HttpServletRequest request) {
         return boardService.deletePost(id, request);
     }
 
