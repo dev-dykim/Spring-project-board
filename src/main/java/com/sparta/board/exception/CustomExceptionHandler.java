@@ -19,8 +19,8 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<MessageResponseDto> commonException(ErrorType error) {
-        MessageResponseDto responseDto = makeErrorResponse(error);
+    public ResponseEntity<MessageResponseDto> customException(CustomException e) {
+        MessageResponseDto responseDto = makeErrorResponse(e.getErrorType());
         return ResponseEntity.badRequest().body(responseDto);
     }
 
