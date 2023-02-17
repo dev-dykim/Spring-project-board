@@ -3,12 +3,13 @@ package com.sparta.board.controller;
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.MessageResponseDto;
+import com.sparta.board.security.UserDetailsImpl;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,8 +26,8 @@ public class BoardController {
 
     // 게시글 작성
     @PostMapping("/api/post")
-    public ResponseEntity<BoardResponseDto> createPost(@RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
-        return boardService.createPost(requestsDto, request);
+    public ResponseEntity<BoardResponseDto> createPost(@RequestBody BoardRequestsDto requestsDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.createPost(requestsDto, userDetails.getUser());
     }
 
     // 선택된 게시글 조회
@@ -37,14 +38,14 @@ public class BoardController {
 
     // 선택된 게시글 수정
     @PutMapping("/api/post/{id}")
-    public ResponseEntity<BoardResponseDto> updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, HttpServletRequest request) {
-        return boardService.updatePost(id, requestsDto, request);
+    public ResponseEntity<BoardResponseDto> updatePost(@PathVariable Long id, @RequestBody BoardRequestsDto requestsDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.updatePost(id, requestsDto, userDetails.getUser());
     }
 
     // 선택된 게시글 삭제
     @DeleteMapping("/api/post/{id}")
-    public ResponseEntity<MessageResponseDto> deletePost(@PathVariable Long id, HttpServletRequest request) {
-        return boardService.deletePost(id, request);
+    public ResponseEntity<MessageResponseDto> deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return boardService.deletePost(id, userDetails.getUser());
     }
 
 }

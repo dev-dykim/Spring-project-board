@@ -18,20 +18,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 15)
+    @Column(nullable = false, length = 20)
     private String username;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 30)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
     @Builder
-    public User(SignupRequestDto requestsDto) {
+    public User(SignupRequestDto requestsDto, String password) {
         this.username = requestsDto.getUsername();
-        this.password = requestsDto.getPassword();
+        this.password = password;
 
         // admin = true 로 입력했을 경우
         if (requestsDto.getAdmin()) {
