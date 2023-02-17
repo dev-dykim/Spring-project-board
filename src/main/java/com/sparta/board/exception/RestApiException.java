@@ -4,10 +4,10 @@ import com.sparta.board.entity.enumSet.ErrorType;
 import lombok.Getter;
 
 @Getter
-public class CustomException extends RuntimeException {
+public class RestApiException extends RuntimeException {
     private final ErrorType errorType;
 
-    public CustomException(ErrorType errorType) {
+    public RestApiException(ErrorType errorType) {
         this.errorType = errorType;
     }
 }
