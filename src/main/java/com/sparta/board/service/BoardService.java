@@ -9,15 +9,14 @@ import com.sparta.board.entity.User;
 import com.sparta.board.entity.enumSet.ErrorType;
 import com.sparta.board.entity.enumSet.UserRoleEnum;
 import com.sparta.board.exception.RestApiException;
-import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
-import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -27,23 +26,30 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
 
     // 게시글 전체 목록 조회
     @Transactional(readOnly = true)
     public ResponseEntity<List<BoardResponseDto>> getPosts() {
 
         List<Board> boardList = boardRepository.findAllByOrderByModifiedAtDesc();
+        List<BoardResponseDto> responseDtoList = new ArrayList<>();
 
-        // 댓글리스트 작성일자 기준 내림차순 정렬
         for (Board board : boardList) {
-            board.getCommentList().sort(Comparator.comparing(Comment::getModifiedAt).reversed());
+            // 댓글리스트 작성일자 기준 내림차순 정렬
+            board.getCommentList()
+                    .sort(Comparator.comparing(Comment::getModifiedAt)
+                            .reversed());
+
+            // board 를 dto 로 변환
+            BoardResponseDto responseDto = BoardResponseDto.builder()
+                    .entity(board)
+                    .build();
+
+            // List<BoardResponseDto> 로 만들기 위해 list 에 dto 하나씩 넣는다.
+            responseDtoList.add(responseDto);
         }
 
-        List<BoardResponseDto> responseDto = boardList.stream().map(BoardResponseDto::new).toList();
-
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(responseDtoList);
 
     }
 
@@ -57,8 +63,12 @@ public class BoardService {
                 .user(user)
                 .build());
 
-        // ResponseEntity 로 반환
-        return ResponseEntity.ok(new BoardResponseDto(board));
+        // BoardResponseDto 변환
+        BoardResponseDto responseDto = BoardResponseDto.builder()
+                .entity(board)
+                .build();
+        // responseEntity 로 반환
+        return ResponseEntity.ok(responseDto);
 
     }
 
@@ -72,10 +82,17 @@ public class BoardService {
         }
 
         // 댓글리스트 작성일자 기준 내림차순 정렬
-        board.get().getCommentList().sort(Comparator.comparing(Comment::getModifiedAt).reversed());
+        board.get()
+                .getCommentList()
+                .sort(Comparator.comparing(Comment::getModifiedAt)
+                        .reversed());
 
-        // 해당 게시글이 있다면 게시글 객체를 Dto 로 변환 후, ResponseEntity body 에 담아 리턴
-        return ResponseEntity.ok(new BoardResponseDto(board.get()));
+        BoardResponseDto responseDto = BoardResponseDto.builder()   // DTO 로 변환
+                .entity(board.get())
+                .build();
+
+        // ResponseEntity body 에 dto 담아 리턴
+        return ResponseEntity.ok(responseDto);
     }
 
     // 선택된 게시글 수정
@@ -85,7 +102,7 @@ public class BoardService {
         // 선택한 게시글이 DB에 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
         if (board.isEmpty()) {
-           throw new RestApiException(ErrorType.NOT_FOUND_WRITING);
+            throw new RestApiException(ErrorType.NOT_FOUND_WRITING);
         }
 
         // 선택한 게시글의 작성자와 토큰에서 가져온 사용자 정보가 일치하는지 확인 (수정하려는 사용자가 관리자라면 게시글 수정 가능)
@@ -96,9 +113,12 @@ public class BoardService {
 
         // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
         board.get().update(requestsDto, user);
-        boardRepository.saveAndFlush(board.get());  // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
+        boardRepository.flush(); // responseDto 에 modifiedAt 업데이트 해주기 위해 flush 사용
 
-        return ResponseEntity.ok(new BoardResponseDto(board.get()));
+        BoardResponseDto responseDto = BoardResponseDto.builder()
+                .entity(board.get())
+                .build();
+        return ResponseEntity.ok(responseDto);
 
     }
 

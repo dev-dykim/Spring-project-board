@@ -24,7 +24,7 @@ public class CommentResponseDto {
         this.username = entity.getUser().getUsername();
         this.createdAt = entity.getCreatedAt();
         this.modifiedAt = entity.getModifiedAt();
-        this.likeCount = entity.getLikesList().size();
+        this.likeCount = entity.getLikesList() != null ? entity.getLikesList().size() : 0;
     }
 
 }
