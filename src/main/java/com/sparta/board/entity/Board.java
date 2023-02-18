@@ -32,6 +32,9 @@ public class Board extends Timestamped {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Likes> likesList = new ArrayList<>();
+
     @Builder
     public Board(BoardRequestsDto requestsDto, User user) {
         this.title = requestsDto.getTitle();

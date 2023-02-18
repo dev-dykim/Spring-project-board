@@ -34,11 +34,10 @@ public class Comment extends Timestamped {
     private List<Likes> likesList = new ArrayList<>();
 
     @Builder
-    public Comment(CommentRequestDto requestDto, Board board, User user, List<Likes> likesList) {
+    public Comment(CommentRequestDto requestDto, Board board, User user) {
         this.contents = requestDto.getContents();
         this.board = board;
         this.user = user;
-        this.likesList = likesList;
     }
 
     public void update(CommentRequestDto requestDto, User user) {
