@@ -9,10 +9,8 @@ import com.sparta.board.entity.User;
 import com.sparta.board.entity.enumSet.ErrorType;
 import com.sparta.board.entity.enumSet.UserRoleEnum;
 import com.sparta.board.exception.RestApiException;
-import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.CommentRepository;
-import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +25,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
 
     // 댓글 작성
     @Transactional
@@ -48,8 +44,12 @@ public class CommentService {
                         .user(user)
                         .build());
 
+        CommentResponseDto responseDto = CommentResponseDto.builder()
+                .entity(comment)
+                .build();
+
         // ResponseEntity 로 반환
-        return ResponseEntity.ok(CommentResponseDto.builder().entity(comment).build());
+        return ResponseEntity.ok(responseDto);
 
     }
 
@@ -71,10 +71,13 @@ public class CommentService {
 
         // 관리자이거나, 댓글의 작성자와 수정하려는 사용자의 정보가 일치한다면, 댓글 수정
         comment.get().update(requestDto, user);
-        commentRepository.saveAndFlush(comment.get());   // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
+        commentRepository.flush();   // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
 
+        CommentResponseDto responseDto = CommentResponseDto.builder()
+                .entity(comment.get())
+                .build();
         // ResponseEntity 에 dto 담아서 리턴
-        return ResponseEntity.ok(CommentResponseDto.builder().entity(comment.get()).build());
+        return ResponseEntity.ok(responseDto);
 
     }
 
