@@ -3,9 +3,11 @@ package com.sparta.board.controller;
 import com.sparta.board.dto.LoginRequestDto;
 import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
+import com.sparta.board.security.UserDetailsImpl;
 import com.sparta.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +30,10 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<MessageResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         return userService.login(requestDto);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<MessageResponseDto> signout(@RequestBody LoginRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return userService.signout(requestDto, userDetails.getUser());
     }
 }
