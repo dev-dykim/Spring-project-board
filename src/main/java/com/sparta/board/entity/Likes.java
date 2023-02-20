@@ -34,13 +34,8 @@ public class Likes {
     private Comment comment;
 
     @Builder
-    public Likes(Board board, User user) {
+    public Likes(Board board, Comment comment, User user) {
         this.board = board;
-        this.user = user;
-    }
-
-    @Builder
-    public Likes(Comment comment, User user) {
         this.comment = comment;
         this.user = user;
     }
@@ -53,7 +48,10 @@ public class Likes {
     }
 
     public static Likes of(Comment comment, User user) {
-        return new Likes(comment, user);
+        return Likes.builder()
+                .comment(comment)
+                .user(user)
+                .build();
     }
 
 }

@@ -4,7 +4,6 @@ import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.enumSet.ErrorType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,11 +24,11 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(responseDto);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<MessageResponseDto> usernameFoundException() {
-        MessageResponseDto responseDto = makeErrorResponse(ErrorType.NOT_FOUND_USER);
-        return ResponseEntity.badRequest().body(responseDto);
-    }
+//    @ExceptionHandler(UsernameNotFoundException.class)
+//    public ResponseEntity<MessageResponseDto> usernameFoundException() {
+//        MessageResponseDto responseDto = makeErrorResponse(ErrorType.NOT_FOUND_USER);
+//        return ResponseEntity.badRequest().body(responseDto);
+//    }
 
     private MessageResponseDto makeErrorResponse(BindingResult bindingResult) {
         String message = "";

@@ -5,6 +5,7 @@ import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.User;
 import com.sparta.board.entity.enumSet.ErrorType;
+import com.sparta.board.entity.enumSet.UserRoleEnum;
 import com.sparta.board.exception.RestApiException;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
@@ -38,8 +39,9 @@ public class UserService {
             throw new RestApiException(ErrorType.DUPLICATED_USERNAME);
         }
 
-        // 입력한 username, password 로 user 객체 만들어 repository 에 저장
-        userRepository.save(User.of(requestDto, password));
+        // 입력한 username, password, admin 으로 user 객체 만들어 repository 에 저장
+        UserRoleEnum role = requestDto.getAdmin() ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
+        userRepository.save(User.of(username, password, role));
 
         return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원가입 성공"));
 
