@@ -36,10 +36,18 @@ public class CommentService {
             throw new RestApiException(ErrorType.NOT_FOUND_WRITING);
         }
 
-        // 게시글이 있다면 댓글 등록
-        Comment comment = commentRepository.save(Comment.of(requestDto, board.get(), user));
+        Long parentCommentId = requestDto.getParentCommentId();
+        Comment comment = Comment.of(requestDto, board.get(), user);
+        if (parentCommentId == null) {  // parentComment 가 없다면
+            commentRepository.save(comment);    // 바로 저장
+            return ResponseEntity.ok(CommentResponseDto.from(comment));
+        }
+        // parentComment 가 있다면 parent comment 에 childComment 를 추가
+        Comment parentComment = commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new RestApiException(ErrorType.NOT_FOUND_WRITING));
+        parentComment.addChildComment(comment); // parentComment 에 childComment 추가
+        commentRepository.save(comment);
 
-        // comment 를 CommetResponseDto 로 변환 후, ResponseEntity body 에 dto 담아 반환
         return ResponseEntity.ok(CommentResponseDto.from(comment));
 
     }
