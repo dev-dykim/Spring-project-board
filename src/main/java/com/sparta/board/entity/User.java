@@ -41,4 +41,11 @@ public class User {
         }
     }
 
+    public static User of(SignupRequestDto requestDto, String password) {
+        return User.builder()
+                .requestsDto(requestDto)
+                .password(password)
+                .build();
+    }
+
 }

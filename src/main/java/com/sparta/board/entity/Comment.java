@@ -44,4 +44,12 @@ public class Comment extends Timestamped {
         this.contents = requestDto.getContents();
         this.user = user;
     }
+
+    public static Comment of(CommentRequestDto requestDto, Board board, User user) {
+        return Comment.builder()
+                .requestDto(requestDto)
+                .board(board)
+                .user(user)
+                .build();
+    }
 }

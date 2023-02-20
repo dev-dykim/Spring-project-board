@@ -47,4 +47,11 @@ public class Board extends Timestamped {
         this.contents = requestsDto.getContents();
         this.user = user;
     }
+
+    public static Board of(BoardRequestsDto requestsDto, User user) {
+        return Board.builder()
+                .requestsDto(requestsDto)
+                .user(user)
+                .build();
+    }
 }

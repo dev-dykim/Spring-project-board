@@ -3,13 +3,11 @@ package com.sparta.board.dto;
 import com.sparta.board.entity.Board;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 public class BoardResponseDto {
     private Long id;
     private String title;
@@ -30,6 +28,12 @@ public class BoardResponseDto {
         this.modifiedAt = entity.getModifiedAt();
         this.likeCount = entity.getLikesList() != null ? entity.getLikesList().size() : 0;
         this.commentList = entity.getCommentList().stream().map(CommentResponseDto::new).toList();
+    }
+
+    public static BoardResponseDto from(Board entity) {
+        return BoardResponseDto.builder()
+                .entity(entity)
+                .build();
     }
 
 }
