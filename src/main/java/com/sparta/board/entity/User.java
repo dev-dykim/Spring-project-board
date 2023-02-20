@@ -1,6 +1,5 @@
 package com.sparta.board.entity;
 
-import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.enumSet.UserRoleEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,22 +28,17 @@ public class User {
     private UserRoleEnum role;
 
     @Builder
-    public User(SignupRequestDto requestsDto, String password) {
-        this.username = requestsDto.getUsername();
+    public User(String username, String password, UserRoleEnum role) {
+        this.username = username;
         this.password = password;
-
-        // admin = true 로 입력했을 경우
-        if (requestsDto.getAdmin()) {
-            this.role = UserRoleEnum.ADMIN;
-        } else {  // admin = false 로 입력했을 경우
-            this.role = UserRoleEnum.USER;
-        }
+        this.role = role;
     }
 
-    public static User of(SignupRequestDto requestDto, String password) {
+    public static User of(String username, String password, UserRoleEnum role) {
         return User.builder()
-                .requestsDto(requestDto)
+                .username(username)
                 .password(password)
+                .role(role)
                 .build();
     }
 
