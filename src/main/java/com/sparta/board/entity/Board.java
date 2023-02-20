@@ -39,7 +39,7 @@ public class Board extends Timestamped {
     private List<Likes> likesList = new ArrayList<>();
 
     @Builder
-    public Board(BoardRequestsDto requestsDto, User user) {
+    private Board(BoardRequestsDto requestsDto, User user) {
         this.title = requestsDto.getTitle();
         this.contents = requestsDto.getContents();
         this.user = user;

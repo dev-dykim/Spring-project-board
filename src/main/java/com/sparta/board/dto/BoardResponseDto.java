@@ -19,7 +19,7 @@ public class BoardResponseDto {
     private List<CommentResponseDto> commentList;
 
     @Builder
-    public BoardResponseDto(Board entity) {
+    private BoardResponseDto(Board entity) {
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.contents = entity.getContents();
@@ -27,7 +27,7 @@ public class BoardResponseDto {
         this.createdAt = entity.getCreatedAt();
         this.modifiedAt = entity.getModifiedAt();
         this.likeCount = entity.getLikesList() != null ? entity.getLikesList().size() : 0;
-        this.commentList = entity.getCommentList().stream().map(CommentResponseDto::new).toList();
+        this.commentList = entity.getCommentList().stream().map(CommentResponseDto::from).toList();
     }
 
     public static BoardResponseDto from(Board entity) {

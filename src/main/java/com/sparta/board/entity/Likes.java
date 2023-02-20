@@ -34,7 +34,7 @@ public class Likes {
     private Comment comment;
 
     @Builder
-    public Likes(Board board, Comment comment, User user) {
+    private Likes(Board board, Comment comment, User user) {
         this.board = board;
         this.comment = comment;
         this.user = user;
