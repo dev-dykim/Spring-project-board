@@ -2,6 +2,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
+import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
@@ -40,8 +41,16 @@ public class BoardService {
                     .sort(Comparator.comparing(Comment::getModifiedAt)
                             .reversed());
 
+            // 대댓글은 제외 부분 작성
+            List<CommentResponseDto> commentList = new ArrayList<>();
+            for (Comment comment : board.getCommentList()) {
+                if (comment.getParentCommentId() == null) {
+                    commentList.add(CommentResponseDto.from(comment));
+                }
+            }
+
             // List<BoardResponseDto> 로 만들기 위해 board 를 BoardResponseDto 로 만들고, list 에 dto 를 하나씩 넣는다.
-            responseDtoList.add(BoardResponseDto.from(board));
+            responseDtoList.add(BoardResponseDto.from(board, commentList));
         }
 
         return ResponseEntity.ok(responseDtoList);
@@ -75,8 +84,16 @@ public class BoardService {
                 .sort(Comparator.comparing(Comment::getModifiedAt)
                         .reversed());
 
+        // 대댓글은 제외 부분 작성
+        List<CommentResponseDto> commentList = new ArrayList<>();
+        for (Comment comment : board.get().getCommentList()) {
+            if (comment.getParentCommentId() == null) {
+                commentList.add(CommentResponseDto.from(comment));
+            }
+        }
+
         // board 를 responseDto 로 변환 후, ResponseEntity body 에 dto 담아 리턴
-        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
+        return ResponseEntity.ok(BoardResponseDto.from(board.get(), commentList));
     }
 
     // 선택된 게시글 수정
