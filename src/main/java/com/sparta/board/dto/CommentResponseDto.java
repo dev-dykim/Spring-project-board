@@ -16,7 +16,7 @@ public class CommentResponseDto {
     private Integer likeCount;
 
     @Builder
-    public CommentResponseDto(Comment entity) {
+    private CommentResponseDto(Comment entity) {
         this.id = entity.getId();
         this.contents = entity.getContents();
         this.username = entity.getUser().getUsername();

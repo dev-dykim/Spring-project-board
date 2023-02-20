@@ -10,7 +10,7 @@ public class MessageResponseDto {
     private int statusCode;
 
     @Builder
-    public MessageResponseDto(String msg, int statusCode) {
+    private MessageResponseDto(String msg, int statusCode) {
         this.msg = msg;
         this.statusCode = statusCode;
     }
