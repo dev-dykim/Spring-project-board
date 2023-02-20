@@ -39,15 +39,9 @@ public class UserService {
         }
 
         // 입력한 username, password 로 user 객체 만들어 repository 에 저장
-        userRepository.save(User.builder()
-                .requestsDto(requestDto)
-                .password(password)  // 인코딩한 패스워드 저장
-                .build());
+        userRepository.save(User.of(requestDto, password));
 
-        return ResponseEntity.ok(MessageResponseDto.builder()   // status : ok
-                .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto (statusCode, msg)
-                .msg("회원가입 성공")
-                .build());
+        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원가입 성공"));
 
     }
 
@@ -69,10 +63,7 @@ public class UserService {
 
         return ResponseEntity.ok()  // status -> OK
                 .headers(headers)   // headers -> JWT
-                .body(MessageResponseDto.builder() // body -> SuccessResponseDto -> statusCode, msg
-                        .statusCode(HttpStatus.OK.value())
-                        .msg("로그인 성공")
-                        .build());
+                .body(MessageResponseDto.of(HttpStatus.OK, "로그인 성공"));  // body -> MessageResponseDto
 
     }
 

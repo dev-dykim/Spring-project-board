@@ -38,16 +38,11 @@ public class CustomExceptionHandler {
             message = bindingResult.getAllErrors().get(0).getDefaultMessage();
         }
 
-        return MessageResponseDto.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .msg(message)
-                .build();
+        return MessageResponseDto.of(HttpStatus.BAD_REQUEST, message);
+
     }
 
     private MessageResponseDto makeErrorResponse(ErrorType error) {
-        return MessageResponseDto.builder()
-                .statusCode(error.getCode())
-                .msg(error.getMessage())
-                .build();
+        return MessageResponseDto.of(error.getCode(), error.getMessage());
     }
 }

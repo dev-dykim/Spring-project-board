@@ -37,19 +37,10 @@ public class CommentService {
         }
 
         // 게시글이 있다면 댓글 등록
-        Comment comment = commentRepository
-                .save(Comment.builder()
-                        .requestDto(requestDto)
-                        .board(board.get())
-                        .user(user)
-                        .build());
+        Comment comment = commentRepository.save(Comment.of(requestDto, board.get(), user));
 
-        CommentResponseDto responseDto = CommentResponseDto.builder()
-                .entity(comment)
-                .build();
-
-        // ResponseEntity 로 반환
-        return ResponseEntity.ok(responseDto);
+        // comment 를 CommetResponseDto 로 변환 후, ResponseEntity body 에 dto 담아 반환
+        return ResponseEntity.ok(CommentResponseDto.from(comment));
 
     }
 
@@ -70,14 +61,12 @@ public class CommentService {
         }
 
         // 관리자이거나, 댓글의 작성자와 수정하려는 사용자의 정보가 일치한다면, 댓글 수정
-        comment.get().update(requestDto, user);
+        comment.get()
+                .update(requestDto, user);
         commentRepository.flush();   // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
 
-        CommentResponseDto responseDto = CommentResponseDto.builder()
-                .entity(comment.get())
-                .build();
         // ResponseEntity 에 dto 담아서 리턴
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(CommentResponseDto.from(comment.get()));
 
     }
 
@@ -102,11 +91,7 @@ public class CommentService {
 
         // ResponseEntity 에 상태코드, 메시지 들어있는 DTO 를 담아서 반환
         return ResponseEntity
-                .ok(MessageResponseDto
-                        .builder()
-                        .msg("댓글 삭제 성공")
-                        .statusCode(HttpStatus.OK.value())
-                        .build());
+                .ok(MessageResponseDto.of(HttpStatus.OK, "댓글 삭제 성공"));
 
     }
 

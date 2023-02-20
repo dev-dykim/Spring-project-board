@@ -40,13 +40,8 @@ public class BoardService {
                     .sort(Comparator.comparing(Comment::getModifiedAt)
                             .reversed());
 
-            // board 를 dto 로 변환
-            BoardResponseDto responseDto = BoardResponseDto.builder()
-                    .entity(board)
-                    .build();
-
-            // List<BoardResponseDto> 로 만들기 위해 list 에 dto 하나씩 넣는다.
-            responseDtoList.add(responseDto);
+            // List<BoardResponseDto> 로 만들기 위해 board 를 BoardResponseDto 로 만들고, list 에 dto 를 하나씩 넣는다.
+            responseDtoList.add(BoardResponseDto.from(board));
         }
 
         return ResponseEntity.ok(responseDtoList);
@@ -58,17 +53,10 @@ public class BoardService {
     public ResponseEntity<BoardResponseDto> createPost(BoardRequestsDto requestsDto, User user) {
 
         // 작성 글 저장
-        Board board = boardRepository.save(Board.builder()
-                .requestsDto(requestsDto)
-                .user(user)
-                .build());
+        Board board = boardRepository.save(Board.of(requestsDto, user));
 
-        // BoardResponseDto 변환
-        BoardResponseDto responseDto = BoardResponseDto.builder()
-                .entity(board)
-                .build();
-        // responseEntity 로 반환
-        return ResponseEntity.ok(responseDto);
+        // BoardResponseDto 로 변환 후 responseEntity body 에 담아 반환
+        return ResponseEntity.ok(BoardResponseDto.from(board));
 
     }
 
@@ -87,12 +75,8 @@ public class BoardService {
                 .sort(Comparator.comparing(Comment::getModifiedAt)
                         .reversed());
 
-        BoardResponseDto responseDto = BoardResponseDto.builder()   // DTO 로 변환
-                .entity(board.get())
-                .build();
-
-        // ResponseEntity body 에 dto 담아 리턴
-        return ResponseEntity.ok(responseDto);
+        // board 를 responseDto 로 변환 후, ResponseEntity body 에 dto 담아 리턴
+        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
     }
 
     // 선택된 게시글 수정
@@ -115,10 +99,7 @@ public class BoardService {
         board.get().update(requestsDto, user);
         boardRepository.flush(); // responseDto 에 modifiedAt 업데이트 해주기 위해 flush 사용
 
-        BoardResponseDto responseDto = BoardResponseDto.builder()
-                .entity(board.get())
-                .build();
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
 
     }
 
@@ -140,10 +121,7 @@ public class BoardService {
 
         // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
         boardRepository.deleteById(id);
-        return ResponseEntity.ok(MessageResponseDto.builder()   // status : 200
-                .statusCode(HttpStatus.OK.value())  // body : SuccessResponseDto
-                .msg("게시글 삭제 성공")
-                .build());
+        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "게시글 삭제 성공"));
 
     }
 

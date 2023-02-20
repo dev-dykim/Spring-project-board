@@ -38,20 +38,14 @@ public class LikesService {
         // 이전에 좋아요 누른 적 있는지 확인
         Optional<Likes> found = likesRepository.findByBoardAndUser(board.get(), user);
         if (found.isEmpty()) {  // 좋아요 누른적 없음
-            Likes likes = Likes.builder()
-                    .board(board.get())
-                    .user(user)
-                    .build();
+            Likes likes = Likes.of(board.get(), user);
             likesRepository.save(likes);
         } else { // 좋아요 누른 적 있음
             likesRepository.delete(found.get()); // 좋아요 눌렀던 정보를 지운다.
             likesRepository.flush();
         }
 
-        BoardResponseDto responseDto = BoardResponseDto.builder()
-                .entity(board.get())
-                .build();
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
     }
 
     // 댓글 좋아요 기능
@@ -66,16 +60,13 @@ public class LikesService {
         // 이전에 좋아요 누른 적 있는지 확인
         Optional<Likes> found = likesRepository.findByCommentAndUser(comment.get(), user);
         if (found.isEmpty()) {  // 좋아요 누른적 없음
-            Likes likes = new Likes(comment.get(), user);
+            Likes likes = Likes.of(comment.get(), user);
             likesRepository.save(likes);
         } else { // 좋아요 누른 적 있음
             likesRepository.delete(found.get()); // 좋아요 눌렀던 정보를 지운다.
             likesRepository.flush();
         }
 
-        CommentResponseDto responseDto = CommentResponseDto.builder()
-                .entity(comment.get())
-                .build();
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(CommentResponseDto.from(comment.get()));
     }
 }

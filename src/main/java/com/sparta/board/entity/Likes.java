@@ -40,4 +40,15 @@ public class Likes {
         this.user = user;
     }
 
+    public static Likes of(Board board, User user) {
+        return Likes.builder()
+                .board(board)
+                .user(user)
+                .build();
+    }
+
+    public static Likes of(Comment comment, User user) {
+        return new Likes(comment, user);
+    }
+
 }
