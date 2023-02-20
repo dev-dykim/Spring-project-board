@@ -37,9 +37,17 @@ public class Comment extends Timestamped {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private List<Likes> likesList = new ArrayList<>();
 
+    @Column
+    private Long parentCommentId;
+
+    @OrderBy("createdAt asc ")
+    @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
+    private List<Comment> childCommentList = new ArrayList<>();
+
     @Builder
     private Comment(CommentRequestDto requestDto, Board board, User user) {
         this.contents = requestDto.getContents();
+        this.parentCommentId = requestDto.getParentCommentId();
         this.board = board;
         this.user = user;
     }
@@ -55,5 +63,9 @@ public class Comment extends Timestamped {
                 .board(board)
                 .user(user)
                 .build();
+    }
+
+    public void addChildComment(Comment child) {
+        this.getChildCommentList().add(child);
     }
 }
