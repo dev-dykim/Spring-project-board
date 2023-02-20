@@ -67,4 +67,17 @@ public class UserService {
 
     }
 
+    // 회원 탈퇴
+    public ResponseEntity<MessageResponseDto> signout(LoginRequestDto requestDto, User user) {
+
+        // 비밀번호 확인
+        String password = requestDto.getPassword();
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RestApiException(ErrorType.NOT_MATCHING_PASSWORD);
+        }
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원탈퇴 완료"));
+    }
 }
