@@ -8,6 +8,9 @@ import com.sparta.board.entity.enumSet.ErrorType;
 import com.sparta.board.entity.enumSet.UserRoleEnum;
 import com.sparta.board.exception.RestApiException;
 import com.sparta.board.jwt.JwtUtil;
+import com.sparta.board.repository.BoardRepository;
+import com.sparta.board.repository.CommentRepository;
+import com.sparta.board.repository.LikesRepository;
 import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +28,9 @@ public class UserService {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
+    private final LikesRepository likesRepository;
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입
@@ -70,6 +76,7 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Transactional
     public ResponseEntity<MessageResponseDto> signout(LoginRequestDto requestDto, User user) {
 
         // 비밀번호 확인
@@ -78,6 +85,9 @@ public class UserService {
             throw new RestApiException(ErrorType.NOT_MATCHING_PASSWORD);
         }
 
+        boardRepository.deleteAllByUser(user);
+        commentRepository.deleteAllByUser(user);
+        likesRepository.deleteAllByUser(user);
         userRepository.delete(user);
 
         return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원탈퇴 완료"));

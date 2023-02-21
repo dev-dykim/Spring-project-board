@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface LikesRepository extends JpaRepository<Likes, Long> {
     Optional<Likes> findByBoardAndUser(Board board, User user);
     Optional<Likes> findByCommentAndUser(Comment comment, User user);
+
+    void deleteAllByUser(User user);
 }
