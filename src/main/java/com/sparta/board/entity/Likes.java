@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -20,17 +18,14 @@ public class Likes {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "board_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Board board;
 
     @ManyToOne
     @JoinColumn(name = "comment_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment comment;
 
     @Builder
