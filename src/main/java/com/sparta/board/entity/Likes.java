@@ -36,17 +36,21 @@ public class Likes {
     }
 
     public static Likes of(Board board, User user) {
-        return Likes.builder()
+        Likes likes = Likes.builder()
                 .board(board)
                 .user(user)
                 .build();
+        board.getLikesList().add(likes);
+        return likes;
     }
 
     public static Likes of(Comment comment, User user) {
-        return Likes.builder()
+        Likes likes = Likes.builder()
                 .comment(comment)
                 .user(user)
                 .build();
+        comment.getLikesList().add(likes);
+        return likes;
     }
 
 }

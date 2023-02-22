@@ -14,7 +14,6 @@ import com.sparta.board.repository.LikesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,8 +26,7 @@ public class LikesService {
     private final CommentRepository commentRepository;
 
     // 게시글 좋아요 기능
-    @Transactional
-    public ResponseEntity<BoardResponseDto> likePost(Long id, User user) {
+     public ResponseEntity<BoardResponseDto> likePost(Long id, User user) {
         // 선택한 게시글이 DB에 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
         if (board.isEmpty()) {
@@ -49,7 +47,6 @@ public class LikesService {
     }
 
     // 댓글 좋아요 기능
-    @Transactional
     public ResponseEntity<CommentResponseDto> likeComment(Long id, User user) {
         // 선택한 댓글이 DB에 있는지 확인
         Optional<Comment> comment = commentRepository.findById(id);
