@@ -54,11 +54,13 @@ public class Comment extends Timestamped {
     }
 
     public static Comment of(CommentRequestDto requestDto, Board board, User user) {
-        return Comment.builder()
+        Comment comment = Comment.builder()
                 .requestDto(requestDto)
                 .board(board)
                 .user(user)
                 .build();
+        board.getCommentList().add(comment);
+        return comment;
     }
 
     public void addChildComment(Comment child) {
