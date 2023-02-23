@@ -1,7 +1,5 @@
 package com.sparta.board.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.board.common.ErrorResponse;
 import com.sparta.board.entity.enumSet.ErrorType;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -30,23 +29,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = jwtUtil.resolveToken(request);
 
         // 토큰이 null 이면 다음 필터로 넘어간다.
-        if (token == null) {
-//            jwtExceptionHandler(response, ErrorType.NOT_VALID_TOKEN);
+        if (token == null || !jwtUtil.validateToken(token)) {
+            request.setAttribute("exception", ErrorType.NOT_VALID_TOKEN);
             filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 토큰이 유효하지 않으면 예외처리
-        if (!jwtUtil.validateToken(token)) {
-//            throw new JwtException(ErrorType.NOT_VALID_TOKEN);
-            jwtExceptionHandler(response, ErrorType.NOT_VALID_TOKEN);
             return;
         }
 
         // 유효한 토큰이라면, 토큰으로부터 사용자 정보를 가져온다.
         Claims info = jwtUtil.getUserInfoFromToken(token);
-        setAuthentication(info.getSubject());   // 사용자 정보로 인증 객체 만들기
-
+        try {
+            setAuthentication(info.getSubject());   // 사용자 정보로 인증 객체 만들기
+        } catch (UsernameNotFoundException e) {
+            request.setAttribute("exception", ErrorType.NOT_FOUND_USER);
+        }
         // 다음 필터로 넘어간다.
         filterChain.doFilter(request, response);
 
@@ -58,19 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
-    }
-
-    // 토큰에 대한 오류가 발생했을 때, 커스터마이징해서 Exception 처리 값을 클라이언트에게 알려준다.
-    public void jwtExceptionHandler(HttpServletResponse response, ErrorType error) {
-        response.setStatus(error.getCode());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        try {
-            String json = new ObjectMapper().writeValueAsString(ErrorResponse.of(error));
-            response.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
     }
 
 }
