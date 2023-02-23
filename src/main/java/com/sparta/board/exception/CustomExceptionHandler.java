@@ -1,10 +1,9 @@
 package com.sparta.board.exception;
 
-import com.sparta.board.dto.MessageResponseDto;
-import com.sparta.board.entity.enumSet.ErrorType;
-import org.springframework.http.HttpStatus;
+import com.sparta.board.common.ApiResponseDto;
+import com.sparta.board.common.ErrorResponse;
+import com.sparta.board.common.ResponseUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,35 +12,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CustomExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<MessageResponseDto> methodValidException(MethodArgumentNotValidException e) {
-        MessageResponseDto responseDto = makeErrorResponse(e.getBindingResult());
-        return ResponseEntity.badRequest().body(responseDto);
+    public ResponseEntity<ApiResponseDto<ErrorResponse>> methodValidException(MethodArgumentNotValidException e) {
+        ErrorResponse response = ErrorResponse.of(e.getBindingResult());
+        return ResponseEntity.badRequest().body(ResponseUtils.error(response));
     }
 
     @ExceptionHandler(RestApiException.class)
-    public ResponseEntity<MessageResponseDto> customException(RestApiException e) {
-        MessageResponseDto responseDto = makeErrorResponse(e.getErrorType());
-        return ResponseEntity.badRequest().body(responseDto);
+    public ResponseEntity<ApiResponseDto<ErrorResponse>> customException(RestApiException e) {
+        ErrorResponse response = ErrorResponse.of(e.getErrorType());
+        return ResponseEntity.badRequest().body(ResponseUtils.error(response));
     }
 
-//    @ExceptionHandler(UsernameNotFoundException.class)
-//    public ResponseEntity<MessageResponseDto> usernameFoundException() {
-//        MessageResponseDto responseDto = makeErrorResponse(ErrorType.NOT_FOUND_USER);
-//        return ResponseEntity.badRequest().body(responseDto);
-//    }
-
-    private MessageResponseDto makeErrorResponse(BindingResult bindingResult) {
-        String message = "";
-
-        if (bindingResult.hasErrors()) {
-            message = bindingResult.getAllErrors().get(0).getDefaultMessage();
-        }
-
-        return MessageResponseDto.of(HttpStatus.BAD_REQUEST, message);
-
-    }
-
-    private MessageResponseDto makeErrorResponse(ErrorType error) {
-        return MessageResponseDto.of(error.getCode(), error.getMessage());
-    }
 }

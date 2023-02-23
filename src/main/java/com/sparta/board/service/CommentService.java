@@ -1,8 +1,10 @@
 package com.sparta.board.service;
 
+import com.sparta.board.common.ApiResponseDto;
+import com.sparta.board.common.ResponseUtils;
+import com.sparta.board.common.SuccessResponse;
 import com.sparta.board.dto.CommentRequestDto;
 import com.sparta.board.dto.CommentResponseDto;
-import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.User;
@@ -13,7 +15,6 @@ import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public ResponseEntity<CommentResponseDto> createComment(Long id, CommentRequestDto requestDto, User user) {
+    public ApiResponseDto<CommentResponseDto> createComment(Long id, CommentRequestDto requestDto, User user) {
 
         // 선택한 게시글 DB 조회
         Optional<Board> board = boardRepository.findById(id);
@@ -40,7 +41,7 @@ public class CommentService {
         Comment comment = Comment.of(requestDto, board.get(), user);
         if (parentCommentId == null) {  // parentComment 가 없다면
             commentRepository.save(comment);    // 바로 저장
-            return ResponseEntity.ok(CommentResponseDto.from(comment));
+            return ResponseUtils.ok(CommentResponseDto.from(comment));
         }
         // parentComment 가 있다면 parent comment 에 childComment 를 추가
         Comment parentComment = commentRepository.findById(parentCommentId)
@@ -48,13 +49,13 @@ public class CommentService {
         parentComment.addChildComment(comment); // parentComment 에 childComment 추가
         commentRepository.save(comment);
 
-        return ResponseEntity.ok(CommentResponseDto.from(comment));
+        return ResponseUtils.ok(CommentResponseDto.from(comment));
 
     }
 
     // 댓글 수정
     @Transactional
-    public ResponseEntity<CommentResponseDto> updateComment(Long id, CommentRequestDto requestDto, User user) {
+    public ApiResponseDto<CommentResponseDto> updateComment(Long id, CommentRequestDto requestDto, User user) {
 
         // 선택한 댓글이 DB에 있는지 확인
         Optional<Comment> comment = commentRepository.findById(id);
@@ -73,13 +74,13 @@ public class CommentService {
         commentRepository.flush();   // responseDto 에 modifiedAt 업데이트 해주기 위해 saveAndFlush 사용
 
         // ResponseEntity 에 dto 담아서 리턴
-        return ResponseEntity.ok(CommentResponseDto.from(comment.get()));
+        return ResponseUtils.ok(CommentResponseDto.from(comment.get()));
 
     }
 
     // 댓글 삭제
     @Transactional
-    public ResponseEntity<MessageResponseDto> deleteComment(Long id, User user) {
+    public ApiResponseDto<SuccessResponse> deleteComment(Long id, User user) {
 
         // 선택한 댓글이 DB에 있는지 확인
         Optional<Comment> comment = commentRepository.findById(id);
@@ -97,8 +98,7 @@ public class CommentService {
         commentRepository.deleteById(id);
 
         // ResponseEntity 에 상태코드, 메시지 들어있는 DTO 를 담아서 반환
-        return ResponseEntity
-                .ok(MessageResponseDto.of(HttpStatus.OK, "댓글 삭제 성공"));
+        return ResponseUtils.ok(SuccessResponse.of(HttpStatus.OK, "댓글 삭제 성공"));
 
     }
 

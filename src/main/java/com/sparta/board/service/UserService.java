@@ -1,7 +1,9 @@
 package com.sparta.board.service;
 
+import com.sparta.board.common.ApiResponseDto;
+import com.sparta.board.common.ResponseUtils;
+import com.sparta.board.common.SuccessResponse;
 import com.sparta.board.dto.LoginRequestDto;
-import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.User;
 import com.sparta.board.entity.enumSet.ErrorType;
@@ -13,13 +15,12 @@ import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.LikesRepository;
 import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,7 @@ public class UserService {
 
     // 회원가입
     @Transactional
-    public ResponseEntity<MessageResponseDto> signup(SignupRequestDto requestDto) {
+    public ApiResponseDto<SuccessResponse> signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
@@ -49,13 +50,12 @@ public class UserService {
         UserRoleEnum role = requestDto.getAdmin() ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
         userRepository.save(User.of(username, password, role));
 
-        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원가입 성공"));
-
+        return ResponseUtils.ok(SuccessResponse.of(HttpStatus.OK, "회원가입 성공"));
     }
 
     // 로그인
     @Transactional(readOnly = true)
-    public ResponseEntity<MessageResponseDto> login(LoginRequestDto requestDto) {
+    public ApiResponseDto<SuccessResponse> login(LoginRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
 
@@ -66,18 +66,15 @@ public class UserService {
         }
 
         // header 에 들어갈 JWT 세팅
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.get().getUsername(), user.get().getRole()));
+        response.setHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.get().getUsername(), user.get().getRole()));
 
-        return ResponseEntity.ok()  // status -> OK
-                .headers(headers)   // headers -> JWT
-                .body(MessageResponseDto.of(HttpStatus.OK, "로그인 성공"));  // body -> MessageResponseDto
+        return ResponseUtils.ok(SuccessResponse.of(HttpStatus.OK, "로그인 성공"));
 
     }
 
     // 회원 탈퇴
     @Transactional
-    public ResponseEntity<MessageResponseDto> signout(LoginRequestDto requestDto, User user) {
+    public ApiResponseDto<SuccessResponse> signout(LoginRequestDto requestDto, User user) {
 
         // 비밀번호 확인
         String password = requestDto.getPassword();
@@ -90,6 +87,6 @@ public class UserService {
         likesRepository.deleteAllByUser(user);
         userRepository.delete(user);
 
-        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "회원탈퇴 완료"));
+        return ResponseUtils.ok(SuccessResponse.of(HttpStatus.OK, "회원탈퇴 완료"));
     }
 }
