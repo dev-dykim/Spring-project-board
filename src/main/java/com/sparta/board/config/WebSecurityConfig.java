@@ -2,6 +2,7 @@ package com.sparta.board.config;
 
 import com.sparta.board.jwt.JwtAuthFilter;
 import com.sparta.board.jwt.JwtUtil;
+import com.sparta.board.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -49,11 +50,10 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/posts").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post/{id}").permitAll()
                 .anyRequest().authenticated()
+                .and().exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.formLogin().permitAll();
-
-//        http.exceptionHandling().accessDeniedPage("/api/user/forbidden");
 
         return http.build();
     }
