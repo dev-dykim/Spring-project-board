@@ -1,7 +1,7 @@
 package com.sparta.board.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.board.dto.MessageResponseDto;
+import com.sparta.board.common.ErrorResponse;
 import com.sparta.board.entity.enumSet.ErrorType;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String json = new ObjectMapper().writeValueAsString(MessageResponseDto.of(error.getCode(), error.getMessage()));
+            String json = new ObjectMapper().writeValueAsString(ErrorResponse.of(error));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

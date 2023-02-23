@@ -1,9 +1,11 @@
 package com.sparta.board.service;
 
+import com.sparta.board.common.ApiResponseDto;
+import com.sparta.board.common.ResponseUtils;
+import com.sparta.board.common.SuccessResponse;
 import com.sparta.board.dto.BoardRequestsDto;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.CommentResponseDto;
-import com.sparta.board.dto.MessageResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.User;
@@ -13,7 +15,6 @@ import com.sparta.board.exception.RestApiException;
 import com.sparta.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ public class BoardService {
 
     // 게시글 전체 목록 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<List<BoardResponseDto>> getPosts() {
+    public ApiResponseDto<List<BoardResponseDto>> getPosts() {
 
         List<Board> boardList = boardRepository.findAllByOrderByModifiedAtDesc();
         List<BoardResponseDto> responseDtoList = new ArrayList<>();
@@ -53,25 +54,25 @@ public class BoardService {
             responseDtoList.add(BoardResponseDto.from(board, commentList));
         }
 
-        return ResponseEntity.ok(responseDtoList);
+        return ResponseUtils.ok(responseDtoList);
 
     }
 
     // 게시글 작성
     @Transactional
-    public ResponseEntity<BoardResponseDto> createPost(BoardRequestsDto requestsDto, User user) {
+    public ApiResponseDto<BoardResponseDto> createPost(BoardRequestsDto requestsDto, User user) {
 
         // 작성 글 저장
         Board board = boardRepository.save(Board.of(requestsDto, user));
 
         // BoardResponseDto 로 변환 후 responseEntity body 에 담아 반환
-        return ResponseEntity.ok(BoardResponseDto.from(board));
+        return ResponseUtils.ok(BoardResponseDto.from(board));
 
     }
 
     // 선택된 게시글 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<BoardResponseDto> getPost(Long id) {
+    public ApiResponseDto<BoardResponseDto> getPost(Long id) {
         // Id에 해당하는 게시글이 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
         if (board.isEmpty()) { // 해당 게시글이 없다면
@@ -93,12 +94,12 @@ public class BoardService {
         }
 
         // board 를 responseDto 로 변환 후, ResponseEntity body 에 dto 담아 리턴
-        return ResponseEntity.ok(BoardResponseDto.from(board.get(), commentList));
+        return ResponseUtils.ok(BoardResponseDto.from(board.get(), commentList));
     }
 
     // 선택된 게시글 수정
     @Transactional
-    public ResponseEntity<BoardResponseDto> updatePost(Long id, BoardRequestsDto requestsDto, User user) {
+    public ApiResponseDto<BoardResponseDto> updatePost(Long id, BoardRequestsDto requestsDto, User user) {
 
         // 선택한 게시글이 DB에 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
@@ -116,13 +117,13 @@ public class BoardService {
         board.get().update(requestsDto, user);
         boardRepository.flush(); // responseDto 에 modifiedAt 업데이트 해주기 위해 flush 사용
 
-        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
+        return ResponseUtils.ok(BoardResponseDto.from(board.get()));
 
     }
 
     // 게시글 삭제
     @Transactional
-    public ResponseEntity<MessageResponseDto> deletePost(Long id, User user) {
+    public ApiResponseDto<SuccessResponse> deletePost(Long id, User user) {
 
         // 선택한 게시글이 DB에 있는지 확인
         Optional<Board> found = boardRepository.findById(id);
@@ -138,7 +139,7 @@ public class BoardService {
 
         // 게시글 id 와 사용자 정보 일치한다면, 게시글 수정
         boardRepository.deleteById(id);
-        return ResponseEntity.ok(MessageResponseDto.of(HttpStatus.OK, "게시글 삭제 성공"));
+        return ResponseUtils.ok(SuccessResponse.of(HttpStatus.OK, "게시글 삭제 성공"));
 
     }
 

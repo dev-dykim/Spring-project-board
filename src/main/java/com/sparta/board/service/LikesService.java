@@ -1,5 +1,7 @@
 package com.sparta.board.service;
 
+import com.sparta.board.common.ApiResponseDto;
+import com.sparta.board.common.ResponseUtils;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.entity.Board;
@@ -12,7 +14,6 @@ import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.LikesRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class LikesService {
     private final CommentRepository commentRepository;
 
     // 게시글 좋아요 기능
-     public ResponseEntity<BoardResponseDto> likePost(Long id, User user) {
+     public ApiResponseDto<BoardResponseDto> likePost(Long id, User user) {
         // 선택한 게시글이 DB에 있는지 확인
         Optional<Board> board = boardRepository.findById(id);
         if (board.isEmpty()) {
@@ -43,11 +44,11 @@ public class LikesService {
             likesRepository.flush();
         }
 
-        return ResponseEntity.ok(BoardResponseDto.from(board.get()));
+        return ResponseUtils.ok(BoardResponseDto.from(board.get()));
     }
 
     // 댓글 좋아요 기능
-    public ResponseEntity<CommentResponseDto> likeComment(Long id, User user) {
+    public ApiResponseDto<CommentResponseDto> likeComment(Long id, User user) {
         // 선택한 댓글이 DB에 있는지 확인
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
@@ -64,6 +65,6 @@ public class LikesService {
             likesRepository.flush();
         }
 
-        return ResponseEntity.ok(CommentResponseDto.from(comment.get()));
+        return ResponseUtils.ok(CommentResponseDto.from(comment.get()));
     }
 }
